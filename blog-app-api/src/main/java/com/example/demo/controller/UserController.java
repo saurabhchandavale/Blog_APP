@@ -19,6 +19,8 @@ import com.example.demo.payload.ApiResponse;
 import com.example.demo.payload.UserDto;
 import com.example.demo.services.UserService;
 
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
@@ -28,20 +30,20 @@ public class UserController {
 	
 	//POST-Create
 	@PostMapping("/create")
-	public ResponseEntity<UserDto> createUser(@RequestBody UserDto userDto){
+	public ResponseEntity<UserDto> createUser(@Valid @RequestBody UserDto userDto){
 		
 		UserDto createUserDto = this.userService.createUser(userDto);
 		return new ResponseEntity<>(createUserDto,HttpStatus.CREATED);
 	}
 	@PutMapping("/{userId}")
-	public ResponseEntity<UserDto> updateUser(@RequestBody UserDto userDto, @PathVariable Integer userId){
+	public ResponseEntity<UserDto> updateUser(@Valid @RequestBody UserDto userDto, @PathVariable Integer userId){
 		System.out.println("Print userid : " + userId);
 		UserDto updateUser = this.userService.updateUser(userDto, userId);
 		return ResponseEntity.ok(updateUser);
 	}
 	
 	@DeleteMapping("/{userId}")
-	public ResponseEntity<ApiResponse> deleteUser(@PathVariable Integer userId){
+	public ResponseEntity<ApiResponse> deleteUser(@Valid @PathVariable Integer userId){
 		this.userService.deleteUser(userId);
 		return new ResponseEntity<ApiResponse>(new ApiResponse("User deleted successfully", true), HttpStatus.OK);
 		}
@@ -51,7 +53,7 @@ public class UserController {
 	}
 	
 	@GetMapping("/{userId}")
-	public ResponseEntity<UserDto> getUserById(@PathVariable Integer userId){
+	public ResponseEntity<UserDto> getUserById(@Valid @PathVariable Integer userId){
 		return ResponseEntity.ok(this.userService.getUserById(userId));
 	}
 	
