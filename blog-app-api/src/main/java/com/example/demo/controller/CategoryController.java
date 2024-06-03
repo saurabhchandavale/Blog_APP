@@ -18,18 +18,20 @@ import com.example.demo.payload.ApiResponse;
 import com.example.demo.payload.CategoryDto;
 import com.example.demo.services.CategoryService;
 
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("/api/category")
 public class CategoryController {
 	@Autowired
 	private CategoryService categoryService;
 	@PostMapping("/")
-	public ResponseEntity<CategoryDto> createCatepory(@RequestBody CategoryDto categoryDto){
+	public ResponseEntity<CategoryDto> createCatepory(@Valid @RequestBody CategoryDto categoryDto){
 		CategoryDto category = this.categoryService.createCategory(categoryDto);
 		return new ResponseEntity<CategoryDto>(category,HttpStatus.CREATED);
 	}
 	@PutMapping("{catId}")
-	public ResponseEntity<CategoryDto> updateCatepory(@RequestBody CategoryDto categoryDto, @PathVariable Integer catId){
+	public ResponseEntity<CategoryDto> updateCatepory(@Valid @RequestBody CategoryDto categoryDto, @PathVariable Integer catId){
 		CategoryDto category = this.categoryService.updateCategory(categoryDto, catId);
 		return new ResponseEntity<CategoryDto>(category,HttpStatus.OK);
 	}

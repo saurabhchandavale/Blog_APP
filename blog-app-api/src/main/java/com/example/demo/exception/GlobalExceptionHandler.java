@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.example.demo.payload.ApiResponse;
 
+import jakarta.validation.ConstraintViolationException;
+
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -33,5 +35,13 @@ public class GlobalExceptionHandler {
 		
 		return new ResponseEntity<Map<String,String>>(response,HttpStatus.BAD_REQUEST);
 		
+	}
+	@ExceptionHandler(ConstraintViolationException.class)
+	public ResponseEntity<Map<String,String>> constraintViolationExceptionHandler(ConstraintViolationException ex){
+		Map<String , String> response = new HashMap<>();
+		String message = ex.getLocalizedMessage();
+		String m = ex.getMessage();
+		response.put(message, m);
+		return new ResponseEntity<Map<String,String>>(response,HttpStatus.BAD_REQUEST);
 	}
 }
