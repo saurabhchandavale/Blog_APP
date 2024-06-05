@@ -7,6 +7,8 @@ import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.entity.Category;
@@ -14,6 +16,7 @@ import com.example.demo.entity.Post;
 import com.example.demo.entity.User;
 import com.example.demo.exception.ResourceNotFoundException;
 import com.example.demo.payload.PostDto;
+import com.example.demo.payload.PostResponse;
 import com.example.demo.reporitries.CategoryRepo;
 import com.example.demo.reporitries.PostRepo;
 import com.example.demo.reporitries.UserRepo;
@@ -35,7 +38,7 @@ public class PostServiceImpl implements PostService {
 		User user = this.userRepo.findById(userId)
 				.orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
 		Category category = this.categoryRepo.findById(categoryId)
-				.orElseThrow(() -> new ResourceNotFoundException("User", "Id", categoryId));
+				.orElseThrow(() -> new ResourceNotFoundException("Category", "Id", categoryId));
 		Post post = this.modelMapper.map(postDto, Post.class);
 		post.setImageName("Default.png");
 		post.setDate(new Date());
@@ -46,15 +49,25 @@ public class PostServiceImpl implements PostService {
 	}
 
 	@Override
-	public Post updatePost(PostDto postDto, Integer postId) {
-		// TODO Auto-generated method stub
-		return null;
+	public PostDto updatePost(PostDto postDto, Integer postId) {
+		Post post = this.postRepo.findById(postId).orElseThrow(() -> new ResourceNotFoundException("Post", "Id", postId));
+		post.setTitle(postDto.getTitle());
+		System.out.println("SCE32: ---------" + postDto.getTitle());
+		System.out.println("SCE32: ---------" + postDto.getContent());
+		//post.setCategory(postDto.getCategory());
+		//post.setUser(postDto.getUser());
+		post.setImageName(postDto.getImageName());
+		post.setContent(postDto.getContent());
+		
+		Post update = this.postRepo.save(post);
+		return this.modelMapper.map(update,PostDto.class);
 	}
 
 	@Override
 	public void deletePost(Integer postId) {
-		// TODO Auto-generated method stub
-
+		Post post = this.postRepo.findById(postId).orElseThrow(() -> new ResourceNotFoundException("Post", "Id", postId));
+		this.postRepo.delete(post);
+		
 	}
 
 	@Override
@@ -67,7 +80,7 @@ public class PostServiceImpl implements PostService {
 
 	@Override
 	public PostDto getPostById(Integer postId) {
-		Post post = this.postRepo.findById(postId).orElseThrow(() -> new ResourceNotFoundException("User", "Id", postId));
+		Post post = this.postRepo.findById(postId).orElseThrow(() -> new ResourceNotFoundException("Post", "Id", postId));
 		return this.modelMapper.map(post, PostDto.class);
 	}
 
@@ -98,6 +111,24 @@ public class PostServiceImpl implements PostService {
 	public List<PostDto> searchPosts(String keyword) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public PostResponse getPosts(Integer pageNo, Integer pageSize) {
+		PageRequest p = PageRequest.of(pageNo, pageSize);
+		Page<Post> all = this.postRepo.findAll(p);
+		List<Post> content = all.getContent();
+		List<PostDto> collect = content.stream().map((post) -> this.modelMapper.map(post, PostDto.class))
+				.collect(Collectors.toList());
+		PostResponse post = new PostResponse();
+		post.setContent(collect);
+		post.setPageNumber(all.getNumber());
+		post.setPageSize(all.getSize());
+		post.setTotalElements(all.getTotalElements());
+		post.setTotalPages(all.getTotalPages());
+		post.setLastPage(all.isLast());
+		
+		return post;
 	}
 
 }

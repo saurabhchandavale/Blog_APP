@@ -4,12 +4,13 @@ import java.util.List;
 
 import com.example.demo.entity.Post;
 import com.example.demo.payload.PostDto;
+import com.example.demo.payload.PostResponse;
 
 public interface PostService {
 
 	PostDto createPost(PostDto postDto, Integer userId, Integer categoryId);
 
-	Post updatePost(PostDto postDto, Integer postId);
+	PostDto updatePost(PostDto postDto, Integer postId);
 
 	void deletePost(Integer postId);
 
@@ -22,4 +23,7 @@ public interface PostService {
 	List<PostDto> getPostsByCategory(Integer categoryId);
 
 	List<PostDto> searchPosts(String keyword);
+	
+	PostResponse getPosts(Integer pageNo, Integer pageSize);
+	
 }
