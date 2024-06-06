@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Sort;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -50,24 +52,26 @@ public class PostServiceImpl implements PostService {
 
 	@Override
 	public PostDto updatePost(PostDto postDto, Integer postId) {
-		Post post = this.postRepo.findById(postId).orElseThrow(() -> new ResourceNotFoundException("Post", "Id", postId));
+		Post post = this.postRepo.findById(postId)
+				.orElseThrow(() -> new ResourceNotFoundException("Post", "Id", postId));
 		post.setTitle(postDto.getTitle());
 		System.out.println("SCE32: ---------" + postDto.getTitle());
 		System.out.println("SCE32: ---------" + postDto.getContent());
-		//post.setCategory(postDto.getCategory());
-		//post.setUser(postDto.getUser());
+		// post.setCategory(postDto.getCategory());
+		// post.setUser(postDto.getUser());
 		post.setImageName(postDto.getImageName());
 		post.setContent(postDto.getContent());
-		
+
 		Post update = this.postRepo.save(post);
-		return this.modelMapper.map(update,PostDto.class);
+		return this.modelMapper.map(update, PostDto.class);
 	}
 
 	@Override
 	public void deletePost(Integer postId) {
-		Post post = this.postRepo.findById(postId).orElseThrow(() -> new ResourceNotFoundException("Post", "Id", postId));
+		Post post = this.postRepo.findById(postId)
+				.orElseThrow(() -> new ResourceNotFoundException("Post", "Id", postId));
 		this.postRepo.delete(post);
-		
+
 	}
 
 	@Override
@@ -80,7 +84,8 @@ public class PostServiceImpl implements PostService {
 
 	@Override
 	public PostDto getPostById(Integer postId) {
-		Post post = this.postRepo.findById(postId).orElseThrow(() -> new ResourceNotFoundException("Post", "Id", postId));
+		Post post = this.postRepo.findById(postId)
+				.orElseThrow(() -> new ResourceNotFoundException("Post", "Id", postId));
 		return this.modelMapper.map(post, PostDto.class);
 	}
 
@@ -99,23 +104,31 @@ public class PostServiceImpl implements PostService {
 	public List<PostDto> getPostsByCategory(Integer categoryId) {
 		Category category = this.categoryRepo.findById(categoryId)
 				.orElseThrow(() -> new ResourceNotFoundException("User", "Id", categoryId));
-		System.out.println(category.toString()+"-----------------");
+		System.out.println(category.toString() + "-----------------");
 		List<Post> postByCategory = this.postRepo.findByCategory(category);
-		List<PostDto> collect = postByCategory.stream()
-				.map((post) -> this.modelMapper.map(post, PostDto.class)).collect(Collectors.toList());
+		List<PostDto> collect = postByCategory.stream().map((post) -> this.modelMapper.map(post, PostDto.class))
+				.collect(Collectors.toList());
 
 		return collect;
 	}
 
 	@Override
 	public List<PostDto> searchPosts(String keyword) {
-		// TODO Auto-generated method stub
-		return null;
+		List<Post> byTitleContaining = this.postRepo.findByTitleContaining(keyword);
+		List<PostDto> collect = byTitleContaining.stream().map((post) -> this.modelMapper.map(post, PostDto.class))
+				.collect(Collectors.toList());
+		return collect;
 	}
 
 	@Override
-	public PostResponse getPosts(Integer pageNo, Integer pageSize) {
-		PageRequest p = PageRequest.of(pageNo, pageSize);
+	public PostResponse getPosts(Integer pageNo, Integer pageSize, String sortBy, String sortDir) {
+		Sort sort = null;
+		if (sortDir.equalsIgnoreCase("asc")) {
+			sort = Sort.by(sortBy).ascending();
+		} else {
+			sort = Sort.by(sortBy).descending();
+		}
+		PageRequest p = PageRequest.of(pageNo, pageSize, sort);
 		Page<Post> all = this.postRepo.findAll(p);
 		List<Post> content = all.getContent();
 		List<PostDto> collect = content.stream().map((post) -> this.modelMapper.map(post, PostDto.class))
@@ -127,7 +140,7 @@ public class PostServiceImpl implements PostService {
 		post.setTotalElements(all.getTotalElements());
 		post.setTotalPages(all.getTotalPages());
 		post.setLastPage(all.isLast());
-		
+
 		return post;
 	}
 

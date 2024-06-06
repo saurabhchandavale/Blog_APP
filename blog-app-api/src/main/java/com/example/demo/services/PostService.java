@@ -23,7 +23,7 @@ public interface PostService {
 	List<PostDto> getPostsByCategory(Integer categoryId);
 
 	List<PostDto> searchPosts(String keyword);
-	
-	PostResponse getPosts(Integer pageNo, Integer pageSize);
-	
+
+	PostResponse getPosts(Integer pageNo, Integer pageSize, String sortBy, String sortDir);
+
 }
