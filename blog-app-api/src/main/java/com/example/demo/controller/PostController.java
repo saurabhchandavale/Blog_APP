@@ -19,6 +19,7 @@ import com.example.demo.config.AppConstants;
 import com.example.demo.payload.ApiResponse;
 import com.example.demo.payload.PostDto;
 import com.example.demo.payload.PostResponse;
+import com.example.demo.services.FileService;
 import com.example.demo.services.PostService;
 
 @RestController
@@ -26,6 +27,8 @@ import com.example.demo.services.PostService;
 public class PostController {
 	@Autowired
 	private PostService postService;
+	@Autowired
+	private FileService fileService;
 
 	@PostMapping("/user/{userId}/category/{categoryId}/post")
 	public ResponseEntity<PostDto> createPost(@RequestBody PostDto postDto, @PathVariable Integer userId,
@@ -89,6 +92,10 @@ public class PostController {
 		List<PostDto> searchPosts = this.postService.searchPosts(keyword);
 		return new ResponseEntity<List<PostDto>>(searchPosts, HttpStatus.OK);
 
+	}
+	@PostMapping("/image/upload/{postId}")
+	public ResponseEntity<ImageResponse> uploadPostImage(){
+		
 	}
 
 }
